@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notes_app/note_database_helper.dart';
+import 'note_database_helper.dart';
+import 'add_note_page.dart';
 import 'note_model.dart';
 import 'note_card.dart';
 
@@ -26,6 +27,26 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  Route _addPageRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const AddNotePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.easeOutExpo;
+      final tween =
+          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      final offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,24 +54,27 @@ class _MainPageState extends State<MainPage> {
         title: const Text('Notes'),
       ),
       body: notes.isEmpty
-        ? const Center(
-          child: Text('No notes yet'),
-        )
-        : 
-        GridView.count(
-          crossAxisCount: 2,
-          padding: const EdgeInsets.all(16),
-          children: notes.map((note) => NoteCard(
-            key: ValueKey(note.id),
-            title: note.title,
-            content: note.content,
-            date: note.date,
-          )).toList(),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.add),
-        ),
+          ? const Center(
+              child: Text('No notes yet'),
+            )
+          : GridView.count(
+              crossAxisCount: 2,
+              padding: const EdgeInsets.all(16),
+              children: notes
+                  .map((note) => NoteCard(
+                        key: ValueKey(note.id),
+                        title: note.title,
+                        content: note.content,
+                        date: note.date,
+                      ))
+                  .toList(),
+            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(_addPageRoute());
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

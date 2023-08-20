@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main_page.dart';
+import 'add_note_page.dart';
 
 void main() {
   runApp(const NotesApp());
@@ -18,6 +19,9 @@ class NotesApp extends StatelessWidget {
         fontFamily: 'Manrope',
       ),
       home: const MainPage(),
+      routes: {
+        '/add-note': (context) => const AddNotePage(),
+      }
     );
   }
 }
