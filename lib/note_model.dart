@@ -1,13 +1,11 @@
 class NoteModel {
 
-  int id;
   String title;
   String content;
   DateTime date;
 
-  NoteModel({required this.id, required this.title, required this.content, required this.date});
-  
-  int getId() => id;
+  NoteModel({required this.title, required this.content, required this.date});
+
 
   String getTitle() => title;
 
@@ -25,7 +23,6 @@ class NoteModel {
 
   Map<String, Object?> toMap() {
     return {
-      'id': id,
       'title': title,
       'content': content,
       'date': date.millisecondsSinceEpoch,
@@ -33,8 +30,7 @@ class NoteModel {
   }
 
   NoteModel.fromMap(Map<String, dynamic> map)
-      : id = map['id'],
-        title = map['title'],
+      : title = map['title'],
         content = map['content'],
         date = DateTime.fromMillisecondsSinceEpoch(map['date']);
 }
