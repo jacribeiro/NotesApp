@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'note_database_helper.dart';
 import 'add_note_page.dart';
+import 'open_note_page.dart';
 import 'note_model.dart';
 import 'note_card.dart';
 
@@ -27,13 +28,31 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  void printDB() async {
-    databaseHelper.printDB();
-  }
-
   Route _addPageRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => AddNotePage(
+        helper: databaseHelper,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOutExpo;
+        final tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+
+  Route _openNoteRoute(NoteModel note) {
+    return PageRouteBuilder(
+      pageBuilder: (context, anumation, secondaryAnimation) => OpenNotePage(
+        note: note,
         helper: databaseHelper,
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -68,12 +87,6 @@ class _MainPageState extends State<MainPage> {
               });
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () {
-              printDB();
-            },
-          )
         ],
       ),
       body: notes.isEmpty
@@ -86,11 +99,16 @@ class _MainPageState extends State<MainPage> {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               children: notes
-                  .map((note) => NoteCard(
-                        title: note.title,
-                        content: note.content,
-                        date: note.date,
-                      ))
+                  .map((note) => InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(_openNoteRoute(note));
+                    },
+                    child: NoteCard(
+                          title: note.title,
+                          content: note.content,
+                          date: note.date,
+                        ),
+                  ))
                   .toList(),
             ),
       floatingActionButton: FloatingActionButton(

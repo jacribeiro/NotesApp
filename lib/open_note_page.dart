@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:notes_app/note_database_helper.dart';
+import 'note_database_helper.dart';
 import 'note_model.dart';
 
-class AddNotePage extends StatefulWidget {
+class OpenNotePage extends StatefulWidget {
   final NoteDatabaseHelper? helper;
+  final NoteModel note;
 
-  const AddNotePage({Key? key, this.helper}) : super(key: key);
+  const OpenNotePage({Key? key, this.helper, required this.note}) : super(key: key);
 
   @override
-  State<AddNotePage> createState() => _AddNotePageState();
+  State<OpenNotePage> createState() => _OpenNotePageState();
 }
 
-class _AddNotePageState extends State<AddNotePage> {
-  final titleController = TextEditingController();
-  final contentController = TextEditingController();
+class _OpenNotePageState extends State<OpenNotePage> {
+  late TextEditingController titleController;
+  late TextEditingController contentController;
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController(text: widget.note.getTitle());
+    contentController = TextEditingController(text: widget.note.getContent());
+  }
 
   @override
   void dispose() {
@@ -25,21 +33,15 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   Widget build(BuildContext context) {
     final NoteDatabaseHelper? helper = widget.helper;
+    final NoteModel note = widget.note;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Note'),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
-              var title = titleController.text;
-              var content = contentController.text;
-              var note = {
-                'title': title,
-                'content': content,
-                'date': DateTime.now().millisecondsSinceEpoch,
-              };
-              helper?.newNote(note);
+              note.update(titleController.text, contentController.text, DateTime.now());
+              helper?.updateNote(note);
               Navigator.pop(context);
             }
           ),
@@ -103,3 +105,4 @@ class _AddNotePageState extends State<AddNotePage> {
     );
   }
 }
+
