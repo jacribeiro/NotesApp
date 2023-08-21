@@ -73,7 +73,9 @@ class _MainPageState extends State<MainPage> {
             )
           : GridView.count(
               crossAxisCount: 2,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
               children: notes
                   .map((note) => NoteCard(
                         title: note.title,
