@@ -27,31 +27,54 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  Route _addPageRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const AddNotePage(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(1.0, 0.0);
-      const end = Offset.zero;
-      const curve = Curves.easeOutExpo;
-      final tween =
-          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      final offsetAnimation = animation.drive(tween);
+  void printDB() async {
+    databaseHelper.printDB();
+  }
 
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
-    },
-  );
-}
+  Route _addPageRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => AddNotePage(
+        helper: databaseHelper,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOutExpo;
+        final tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    loadNotes();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notes'),
+        title: const Text('My Notes'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              databaseHelper.clearDatabase();
+              setState(() {
+                loadNotes();
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              printDB();
+            },
+          )
+        ],
       ),
       body: notes.isEmpty
           ? const Center(
@@ -59,10 +82,11 @@ class _MainPageState extends State<MainPage> {
             )
           : GridView.count(
               crossAxisCount: 2,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
               children: notes
                   .map((note) => NoteCard(
-                        key: ValueKey(note.id),
                         title: note.title,
                         content: note.content,
                         date: note.date,

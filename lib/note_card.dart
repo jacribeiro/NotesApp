@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NoteCard extends StatefulWidget {
   final String title;
@@ -14,7 +15,12 @@ class NoteCard extends StatefulWidget {
 class _NoteCardState extends State<NoteCard> {
   @override
   Widget build(BuildContext context) {
+    String formattedDate = DateFormat('dd-MM-yyyy   HH:mm').format(widget.date);
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        color: Colors.yellow.shade200,
+      ),
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -40,7 +46,7 @@ class _NoteCardState extends State<NoteCard> {
           ),
           const SizedBox(height: 8),
           Text(
-            widget.date.toString(),
+            formattedDate,
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,)
