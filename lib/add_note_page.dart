@@ -77,6 +77,7 @@ class _AddNotePageState extends State<AddNotePage> {
                 ),
                 TextFormField(
                   autofocus: true,
+                  maxLines: null,
                   controller: contentController,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 10, right: 10),

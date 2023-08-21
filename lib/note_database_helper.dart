@@ -53,5 +53,9 @@ class NoteDatabaseHelper {
     await db.delete('notes');
   }
 
-
+  Future<void> printDB() async {
+    final db = await database;
+    final List<Map<String, dynamic>> noteMaps = await db.query('notes');
+    print(noteMaps);
+  }
 }
