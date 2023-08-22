@@ -7,8 +7,6 @@ class NoteDatabaseHelper {
 
   static Database? _database;
 
-  static int currentId = 1;
-
   NoteDatabaseHelper._init();
 
   Future<Database> get database async {
@@ -31,21 +29,17 @@ class NoteDatabaseHelper {
 
   Future<void> newNote(note) async {
     final db = await database;
-    note['id'] = currentId++;
     await db.insert('notes', note);
   }
 
-  Future<void> updateNote(note) async {
+  Future<void> updateNote(NoteModel note) async {
     final db = await database;
     await db.update('notes', note.toMap(), where: 'id = ?', whereArgs: [note.getId()]);
   }
 
-  Future<void> saveNotes(List<NoteModel> notes) async {
+  Future<void> deleteNote(int id) async {
     final db = await database;
-    await db.delete('notes');
-    for (var note in notes) {
-      await db.insert('notes', note.toMap());
-    }
+    await db.delete('notes', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<NoteModel>> loadNotes() async {
@@ -57,7 +51,6 @@ class NoteDatabaseHelper {
   Future<void> clearDatabase() async {
     final db = await database;
     await db.delete('notes');
-    currentId = 1;
   }
 
   Future<void> printDB() async {

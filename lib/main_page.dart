@@ -15,6 +15,8 @@ class _MainPageState extends State<MainPage> {
   NoteDatabaseHelper databaseHelper = NoteDatabaseHelper.instance;
   List<NoteModel> notes = [];
 
+  Offset tapPosition = Offset.zero;
+
   @override
   void initState() {
     super.initState();
@@ -51,7 +53,7 @@ class _MainPageState extends State<MainPage> {
 
   Route _openNoteRoute(NoteModel note) {
     return PageRouteBuilder(
-      pageBuilder: (context, anumation, secondaryAnimation) => OpenNotePage(
+      pageBuilder: (context, animation, secondaryAnimation) => OpenNotePage(
         note: note,
         helper: databaseHelper,
       ),
@@ -67,6 +69,37 @@ class _MainPageState extends State<MainPage> {
           position: offsetAnimation,
           child: child,
         );
+      },
+    );
+  }
+
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
+  void _showPopupMenu(BuildContext context, NoteModel note) async {
+    final RenderObject? overlay = Overlay.of(context).context.findRenderObject();
+
+    await showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+          Rect.fromLTWH(tapPosition.dx, tapPosition.dy, 30, 30),
+          Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+              overlay.paintBounds.size.height),
+        ),
+        items: [
+          const PopupMenuItem(
+            value: 'delete',
+            child: Text('Delete Note'),
+          )
+        ]).then(
+      (selectedValue) {
+        if (selectedValue == 'delete') {
+          databaseHelper.deleteNote(note.getId());
+        }
       },
     );
   }
@@ -98,19 +131,30 @@ class _MainPageState extends State<MainPage> {
               padding: const EdgeInsets.all(12),
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              children: notes
-                  .map((note) => InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(_openNoteRoute(note));
-                    },
-                    child: NoteCard(
-                          title: note.title,
-                          content: note.content,
-                          date: note.date,
+              children: notes.map(
+                (note) {
+                  return Builder(
+                    builder: (BuildContext cardContext) {
+                      return InkWell(
+                        onTapDown: (details) {
+                          _getTapPosition(details);
+                        },
+                        onTap: () {
+                          Navigator.of(context).push(_openNoteRoute(note));
+                        },
+                        onLongPress: () {
+                          _showPopupMenu(cardContext, note);
+                        },
+                        child: NoteCard(
+                          title: note.getTitle(),
+                          content: note.getContent(),
+                          date: note.getDate(),
                         ),
-                  ))
-                  .toList(),
-            ),
+                      );
+                    },
+                  );
+                },
+              ).toList()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(_addPageRoute());
