@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/note_database_helper.dart';
-import 'note_model.dart';
+import 'package:path/path.dart';
 
 class AddNotePage extends StatefulWidget {
   final NoteDatabaseHelper? helper;
@@ -30,19 +30,18 @@ class _AddNotePageState extends State<AddNotePage> {
         title: const Text('Add Note'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: () {
-              var title = titleController.text;
-              var content = contentController.text;
-              var note = {
-                'title': title,
-                'content': content,
-                'date': DateTime.now().millisecondsSinceEpoch,
-              };
-              helper?.newNote(note);
-              Navigator.pop(context);
-            }
-          ),
+              icon: const Icon(Icons.check),
+              onPressed: () {
+                var title = titleController.text;
+                var content = contentController.text;
+                var note = {
+                  'title': title,
+                  'content': content,
+                  'date': DateTime.now().millisecondsSinceEpoch,
+                };
+                helper?.newNote(note);
+                Navigator.pop(context);
+              }),
         ],
       ),
       body: Center(
@@ -54,7 +53,8 @@ class _AddNotePageState extends State<AddNotePage> {
                 TextFormField(
                   controller: titleController,
                   decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.only(top: 20, bottom: 20, left: 10, right: 10),
+                    contentPadding: const EdgeInsets.only(
+                        top: 20, bottom: 20, left: 10, right: 10),
                     hintText: 'Add a title',
                     hintStyle: TextStyle(
                       color: Colors.grey.shade600,
@@ -78,21 +78,53 @@ class _AddNotePageState extends State<AddNotePage> {
                     fontSize: 36,
                   ),
                 ),
-                TextFormField(
-                  autofocus: true,
-                  maxLines: null,
-                  controller: contentController,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.only(left: 10, right: 10),
-                    border: InputBorder.none,
-                    hintText: 'Add some text',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade500,
+                Expanded(
+                  child: TextFormField(
+                    autofocus: true,
+                    maxLines: null,
+                    controller: contentController,
+                    decoration: InputDecoration(
+                      contentPadding:
+                          const EdgeInsets.only(left: 10, right: 10),
+                      border: InputBorder.none,
+                      hintText: 'Add some text',
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 18,
+                      ),
+                    ),
+                    style: const TextStyle(
                       fontSize: 18,
                     ),
                   ),
-                  style: const TextStyle(
-                    fontSize: 18,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.brown.shade700,
+                      )
+                    )
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.format_list_bulleted),
+                        color: Colors.brown.shade700,
+                        onPressed: () {
+                          
+                        },
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.check_box_outlined),
+                        color: Colors.brown.shade700,
+                        onPressed: () {},
+                      )
+                    ],
                   ),
                 ),
               ],
