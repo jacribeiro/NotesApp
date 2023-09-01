@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/note_database_helper.dart';
-import 'package:path/path.dart';
 
 class AddNotePage extends StatefulWidget {
   final NoteDatabaseHelper? helper;
@@ -14,12 +13,37 @@ class AddNotePage extends StatefulWidget {
 class _AddNotePageState extends State<AddNotePage> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
+  bool bulletPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    contentController.addListener(bulletOption);
+  }
 
   @override
   void dispose() {
     titleController.dispose();
+    contentController.removeListener(bulletOption);
     contentController.dispose();
     super.dispose();
+  }
+
+  void bulletOption() {
+    final text = contentController.text;
+    final lastChar = text.isNotEmpty ? text[text.length - 1] : "";
+
+    if (bulletPressed) {
+      if (lastChar == '\n') {
+        putBullet();
+      }
+    }
+  }
+
+  void putBullet() {
+    final text = contentController.text;
+    contentController.text = '$text\u2022';
+    contentController.selection = TextSelection.collapsed(offset: text.length + 1);
   }
 
   @override
@@ -29,6 +53,12 @@ class _AddNotePageState extends State<AddNotePage> {
       appBar: AppBar(
         title: const Text('Add Note'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.print),
+            onPressed: () {
+              print(contentController.selection.baseOffset);
+            }
+          ),
           IconButton(
               icon: const Icon(Icons.check),
               onPressed: () {
@@ -101,19 +131,26 @@ class _AddNotePageState extends State<AddNotePage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Colors.brown.shade700,
-                      )
-                    )
-                  ),
+                      border: Border(
+                          top: BorderSide(
+                    color: Colors.brown.shade700,
+                  ))),
                   child: Row(
                     children: [
                       IconButton(
                         icon: const Icon(Icons.format_list_bulleted),
-                        color: Colors.brown.shade700,
+                        color: bulletPressed
+                            ? Colors.brown.shade100
+                            : Colors.brown.shade700,
                         onPressed: () {
-                          
+                          setState(
+                            () {
+                              bulletPressed = !bulletPressed;
+                              if (bulletPressed) {
+                                putBullet();
+                              }
+                            },
+                          );
                         },
                       ),
                       const SizedBox(

@@ -81,7 +81,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _showPopupMenu(BuildContext context, NoteModel note) async {
-    final RenderObject? overlay = Overlay.of(context).context.findRenderObject();
+    final RenderObject? overlay =
+        Overlay.of(context).context.findRenderObject();
 
     await showMenu(
         context: context,
@@ -113,12 +114,35 @@ class _MainPageState extends State<MainPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              databaseHelper.clearDatabase();
-              setState(() {
-                loadNotes();
-              });
-            },
+            onPressed: () => showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Delete notes'),
+                content:
+                    const Text('Are you sure you want to delete all notes?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      databaseHelper.clearDatabase();
+                      setState(() {
+                        loadNotes();
+                      });
+                      Navigator.pop(context, 'Delete');
+                    },
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
